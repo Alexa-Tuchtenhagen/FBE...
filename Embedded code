@@ -1,0 +1,43 @@
+/*
+* attempt 2.c
+*
+* Created 4/28/2025 3:57:07 PM
+* Author : User
+*/
+
+#define F_CPU 16000000UL
+
+#include <avr/io.h>
+#include <util/delay.h>
+
+  //Initialize Timer0 for PMW on PD5 (OC0B / Arduino pin 5)
+static inline void initTimer0(void){
+  TCCR0A |= (1 << WGM00) | (1 << WGM01); // Fast PWM mode
+  TCCR0A |= (1<< COM0B1);                // Non-inverting PWM on OC0B
+  TCCR0B |= (1 << CS01) | (1 << CS00);  // Prescaler - 64
+}
+
+int main(void)
+{
+  // Set PD2 (IN2), PD3 (IN1), and PDS (ENA - PWM) as outputs
+  DORD |= (1 << PD2) | (1 << PD3) | (1 <<PD5);
+
+  // LED pins: PB4 (pin 12), PB5 (pin 13)
+  DDRB |= (1 << PB4) | (1 << PB5);  // Set pins 12 and 13 as output
+  PORTB |= (1 << PB4) | (1 << PB5);  // Turn both LEDs ON
+
+  // Set motor direction: IN1 = HIGH, IN2 = LOW
+  PORTD |= (1 << PD3);  // IN1
+  PORTD &= ~(1 << PD2);
+
+  // Initialize PWM
+  initTimer0();
+
+  // Set speed (duty cycle) - 25 out of 255 (~10%)
+  OCR0B = 200;
+
+  // Keep running
+  while (1) {
+    // Do nothing - motor stays on at set speed
+  }
+}
